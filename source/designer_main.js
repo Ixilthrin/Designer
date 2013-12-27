@@ -75,8 +75,21 @@ function circlify_command()
     if (segmentsSelectedIndices.length == 0) {
         return;
     }
-    var segment = thePage.segments[segmentsSelectedIndices[0]];
-    segment.values = circlify(segment.values);
+    for (var i = 0; i < segmentsSelectedIndices.length; i++) {
+        var segment = thePage.segments[segmentsSelectedIndices[i]];
+        segment.values = circlify(segment.values);
+    }
+}
+
+function ellipsify_command()
+{
+    if (segmentsSelectedIndices.length == 0) {
+        return;
+    }
+    for (var i = 0; i < segmentsSelectedIndices.length; i++) {
+        var segment = thePage.segments[segmentsSelectedIndices[i]];
+        segment.values = ellipsify(segment.values);
+    }
 }
 
 function rectify_command()
@@ -84,8 +97,23 @@ function rectify_command()
     if (segmentsSelectedIndices.length == 0) {
         return;
     }
-    var segment = thePage.segments[segmentsSelectedIndices[0]];
-    segment.values = rectify(segment.values, lineWidth);
+    for (var i = 0; i < segmentsSelectedIndices.length; i++) {
+        var segment = thePage.segments[segmentsSelectedIndices[i]];
+        segment.values = rectify(segment.values, segment.width);
+    }
+}
+
+function smoothify_command()
+{
+    if (segmentsSelectedIndices.length == 0) {
+        return;
+    }
+    for (var s = 0; s < 20; s++) {
+        for (var i = 0; i < segmentsSelectedIndices.length; i++) {
+            var segment = thePage.segments[segmentsSelectedIndices[i]];
+            segment.values = smoothify(segment.values);
+        }
+    }
 }
 
 function straighten_command()
@@ -93,8 +121,10 @@ function straighten_command()
     if (segmentsSelectedIndices.length == 0) {
         return;
     }
-    var segment = thePage.segments[segmentsSelectedIndices[0]];
-    segment.values = straighten(segment.values);
+    for (var i = 0; i < segmentsSelectedIndices.length; i++) {
+        var segment = thePage.segments[segmentsSelectedIndices[i]];
+        segment.values = straighten(segment.values);
+    }
 }
 
 function cred()
