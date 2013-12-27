@@ -27,14 +27,7 @@ var inputMode = "text";
 var mouseIsDown = false;
 var lineColor = "blue"
 var lineWidth = 2;
-var currentSegment = new Object();
-currentSegment.values = new Array();
-currentSegment.color = lineColor;
-currentSegment.width = lineWidth;
-currentSegment.parentIndex = -1;
-currentSegment.properties = new Object();
-currentSegment.properties.keys = new Array();
-currentSegment.properties.values = new Array();
+var currentSegment = createSegment(new Array(), -1, lineWidth, lineColor, [], []); 
 var selectionBoxInitialX = -1;
 var selectionBoxInitialY = -1;
 var selectionBoxFinalX = -1;
@@ -221,6 +214,11 @@ function createSegment(coords, parentIndex, width, color, keys, values)
     segment.properties = new Object();
     segment.properties.keys = keys;
     segment.properties.values = values;
+    segment.minX = 1000;
+    segment.maxX = 0;
+    segment.minY = 1000;
+    segment.maxY = 0;
+    updateSegmentBounds(segment);
     return segment;
 }
 
@@ -383,8 +381,8 @@ function copyBox(box)
     var newBox = new Object();
     newBox.text = box.text;
     newBox.maxWidth = box.maxWidth;
-    newBox.x = box.x + 30; 
-    newBox.y = box.y + 30; 
+    newBox.x = box.x; 
+    newBox.y = box.y; 
     if (box.textColor == undefined) {
         box.textColor = "black";
     }
@@ -407,6 +405,50 @@ function copyBox(box)
     return newBox;
 }
 
+function updateSegmentBounds(segment) {
+    if (segment.values.length < 2) {
+        return;
+    }
+    segment.minX = segment.values[0];
+    segment.maxX = segment.values[0];
+    segment.minY = segment.values[1];
+    segment.maxY = segment.values[1];
+    var i = 0;
+    for (i = 0; i < segment.values.length; i += 2) {
+        var x = segment.values[i];
+        var y = segment.values[i + 1];
+        if (x < segment.minX) {
+            segment.minX = x;
+        }
+        if (x > segment.maxX) {
+            segment.maxX = x;
+        }
+        if (y < segment.minY) {
+            segment.minY = y;
+        }
+        if (y > segment.maxY) {
+            segment.maxY = y;
+        }
+    }
+}
+
+function addPointToSegment(segment, x, y) {
+    segment.values.push(x);
+    segment.values.push(y);
+    if (x < segment.minX) {
+        segment.minX = x;
+    }
+    if (x > segment.maxX) {
+        segment.maxX = x;
+    }
+    if (y < segment.minY) {
+        segment.minY = y;
+    }
+    if (y > segment.maxY) {
+        segment.maxY = y;
+    }
+}
+
 function copySegment(segment) 
 {
     var newSegment = new Object();
@@ -417,8 +459,12 @@ function copySegment(segment)
     newSegment.width = segment.width;
     newSegment.color = segment.color;
     newSegment.values = new Array();
+    newSegment.minX = segment.minX;
+    newSegment.maxX = segment.maxX;
+    newSegment.minY = segment.minY;
+    newSegment.maxY = segment.maxY;
     for (var j = 0; j < segment.values.length; j++) {
-        newSegment.values.push(segment.values[j] + 30);
+        newSegment.values.push(segment.values[j]);
     }
     return newSegment;
 }
@@ -426,10 +472,11 @@ function copySegment(segment)
 function copySelection() 
 {
     copiedBoxes = new Array();
+    copiedSegments = new Array();
+
     for (var i = 0; i < selectedIndices.length; i++) {
         copiedBoxes.push(copyBox(thePage.boxes[selectedIndices[i]]));
     }
-    copiedSegments = new Array();
     for (var i = 0; i < segmentsSelectedIndices.length; i++) {
         copiedSegments.push(copySegment(thePage.segments[segmentsSelectedIndices[i]]));
     }
@@ -437,14 +484,35 @@ function copySelection()
 
 function pasteSelection()
 {
-    for (var i = 0; i < copiedBoxes.length; i++) {
+    var i = 0; 
+    var j = 0; 
+    var changeX = 0; 
+    var changeY = 0; 
+    selectedIndices = [];
+    segmentsSelectedIndices = [];
+    if (copiedBoxes.length > 0) {
+        changeX = copiedBoxes[0].x - startX;
+        changeY = copiedBoxes[0].y - startY;
+    } else if (copiedSegments.length > 0 && copiedSegments[0].values.length > 1) {
+        changeX = copiedSegments[0].values[0] - startX;
+        changeY = copiedSegments[0].values[1] - startY;
+    }
+    for (i = 0; i < copiedBoxes.length; i++) {
+        copiedBoxes[i].x -= changeX;
+        copiedBoxes[i].y -= changeY;
         thePage.boxes.push(copiedBoxes[i]);
+        selectedIndices.push(thePage.boxes.length - 1);
     }
-    for (var i = 0; i < copiedSegments.length; i++) {
+    for (i = 0; i < copiedSegments.length; i++) {
+        for (j = 0; j < copiedSegments[i].values.length; j += 2) {
+            copiedSegments[i].values[j] = copiedSegments[i].values[j] - changeX;
+            copiedSegments[i].values[j + 1] = copiedSegments[i].values[j + 1] - changeY;
+        }
         thePage.segments.push(copiedSegments[i]);
+        updateSegmentBounds(copiedSegments[i]);
+        segmentsSelectedIndices.push(thePage.segments.length - 1);
     }
-    copiedBoxes = new Array();
-    copiedSegments = new Array();
+    copySelection();
 }
 
 function copyPage()
@@ -490,18 +558,8 @@ function copyPage()
     }
     newPage.segments = new Array();
     for (var i = 0; i < thePage.segments.length; i++) {
-        var segment = new Object();
-        segment.properties = new Object();
-        segment.properties.keys = new Array();
-        segment.properties.values = new Array();
-        segment.parentIndex = thePage.segments[i].parentIndex;
-        segment.width = thePage.segments[i].width;
-        segment.color = thePage.segments[i].color;
-        segment.values = new Array();
-        for (var j = 0; j < thePage.segments[i].values.length; j++) {
-            segment.values.push(thePage.segments[i].values[j]);
-        }
-        newPage.segments.push(segment);
+        var newSegment = copySegment(thePage.segments[i]);
+        newPage.segments.push(newSegment);
     }
     newPage.imageNamess = [];
     newPage.images = [];
@@ -571,12 +629,25 @@ function checkBoxIntersection()
         return;
     }
     selectedIndices = [];
-    for (var i = 0; i < thePage.boxes.length; ++i) {
+    segmentsSelectedIndices = [];
+    var i = 0;
+    for (i = 0; i < thePage.boxes.length; ++i) {
         var textBoxWidth = thePage.boxes[i].width;
         var textBoxHeight = thePage.boxes[i].height;
         if (selectionBoxInitialX < thePage.boxes[i].x - 7 && selectionBoxFinalX > thePage.boxes[i].x + textBoxWidth && selectionBoxInitialY < thePage.boxes[i].y - 15 && selectionBoxFinalY > thePage.boxes[i].y - 15 + textBoxHeight) {
             if (selectedIndices.indexOf(i) < 0) {
                 selectedIndices.push(i);
+            }
+        }
+    }
+    for (i = 0; i < thePage.segments.length; i++) {
+        if (selectionBoxInitialX < thePage.segments[i].minX &&
+            selectionBoxFinalX > thePage.segments[i].maxX &&
+            selectionBoxInitialY < thePage.segments[i].minY &&
+            selectionBoxFinalY > thePage.segments[i].maxY) {
+
+            if (segmentsSelectedIndices.indexOf(i) < 0) {
+                segmentsSelectedIndices.push(i);
             }
         }
     }
@@ -810,6 +881,10 @@ function main()
                            theGroupCount++;
                            var tSegment = currentSegments[j];
                            var values = tSegment.values;
+                           tSegment.minX += changeX;
+                           tSegment.maxX += changeX;
+                           tSegment.minY += changeY;
+                           tSegment.maxY += changeY;
                            for (var m = 0; m < values.length; m = m + 2) {
                                values[m] += changeX;
                                values[m + 1] += changeY;
@@ -826,6 +901,10 @@ function main()
                    if (!movedByGroup && theGroupCount < 2) {
                        for (var i = 0; i < segmentsSelectedIndices.length; i++) {
                            var tSegment = thePage.segments[segmentsSelectedIndices[i]];
+                           tSegment.minX += changeX;
+                           tSegment.maxX += changeX;
+                           tSegment.minY += changeY;
+                           tSegment.maxY += changeY;
                            var values = tSegment.values;
                            for (var m = 0; m < values.length; m = m + 2) {
                                values[m] += changeX;
@@ -843,8 +922,9 @@ function main()
                    selectionBoxFinalY = document.body.scrollTop + e.clientY - canvas.offsetTop;
                }
            } else {
-               currentSegment.values.push(document.body.scrollLeft + e.clientX - canvas.offsetLeft);
-               currentSegment.values.push(document.body.scrollTop + e.clientY - canvas.offsetTop);
+               var curX = document.body.scrollLeft + e.clientX - canvas.offsetLeft;
+               var curY = document.body.scrollTop + e.clientY - canvas.offsetTop;
+               addPointToSegment(currentSegment, curX, curY);
            }
        } else {
            if (inputMode == "text") {
@@ -877,8 +957,9 @@ function main()
        } else {
            currentSegment.color = lineColor;
            currentSegment.width = lineWidth;
-           currentSegment.values.push(document.body.scrollLeft + e.clientX - canvas.offsetLeft);
-           currentSegment.values.push(document.body.scrollTop + e.clientY - canvas.offsetTop);
+           var curX = document.body.scrollLeft + e.clientX - canvas.offsetLeft;
+           var curY = document.body.scrollTop + e.clientY - canvas.offsetTop;
+           addPointToSegment(currentSegment, curX, curY);
        }
    }); 
    canvas.addEventListener("dblclick", function(e) {
@@ -955,22 +1036,16 @@ function main()
                selectionBoxInitialY = startY;
            }
        } else {
-           currentSegment = new Object();
-           currentSegment.parentIndex = -1;
-           currentSegment.values = new Array();
-           currentSegment.color = lineColor;
-           currentSegment.width = lineWidth;
-           currentSegment.properties = new Object();
-           currentSegment.properties.keys = new Array();
-           currentSegment.properties.values = new Array();
+           currentSegment = createSegment(new Array(), -1, lineWidth, lineColor, [], []); 
            if (selectedIndices.length > 0) {
                currentSegment.parentIndex = selectedIndices[0];
            } else {
                currentSegment.parentIndex = -1;
            }
            thePage.segments.push(currentSegment);
-           currentSegment.values.push(document.body.scrollLeft + e.clientX - canvas.offsetLeft);
-           currentSegment.values.push(document.body.scrollTop + e.clientY - canvas.offsetTop);
+           var curX = document.body.scrollLeft + e.clientX - canvas.offsetLeft;
+           var curY = document.body.scrollTop + e.clientY - canvas.offsetTop;
+           addPointToSegment(currentSegment, curX, curY);
        }
    }); 
    canvas.addEventListener("keydown", function(e) {
