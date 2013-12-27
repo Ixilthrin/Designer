@@ -1,0 +1,188 @@
+<html>
+<head>
+<script type="text/javascript" src="shapes.js"></script>
+<script type="text/javascript" src="edittext.js"></script>
+<script type="text/javascript" src="designer_main.js"></script>
+<script type="text/javascript" src="currentDoc.js"></script>
+<script type="text/javascript" src="fundamentals_doc.js"></script>
+<script type="text/javascript" src="css_and_html_doc.js"></script>
+<script type="text/javascript" src="tree_doc.js"></script>
+<script type="text/javascript" src="tutorial_doc.js"></script>
+<style>
+input.button {
+    background: #efefef; 
+    background: linear-gradient(top, #efefef 0%, #bbbbbb 100%);  
+    background: -moz-linear-gradient(top, #efefef 0%, #bbbbbb 100%); 
+    background: -webkit-linear-gradient(top, #efefef 0%,#bbbbbb 100%); 
+    box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+    padding: 0 20px;
+    border-radius: 10px;  
+    list-style: none;
+    position: relative;
+}
+
+#red {
+    background: rgb(255, 0, 0); 
+    background: linear-gradient(top, rgb(255, 0, 0) 0%, #bbbbbb 100%);  
+    background: -moz-linear-gradient(top, rgb(255, 0, 0) 0%, #bbbbbb 100%); 
+    background: -webkit-linear-gradient(top, rgb(255, 0, 0) 0%,#bbbbbb 100%); 
+    box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+    padding: 0 20px;
+    border-radius: 10px;  
+    list-style: none;
+    position: relative;
+}
+
+#green {
+    background: #00ff00; 
+    background: linear-gradient(top, #00ff00 0%, #bbbbbb 100%);  
+    background: -moz-linear-gradient(top, #00ff00 0%, #bbbbbb 100%); 
+    background: -webkit-linear-gradient(top, #00ff00 0%,#bbbbbb 100%); 
+    box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+    padding: 0 20px;
+    border-radius: 10px;  
+    list-style: none;
+    position: relative;
+}
+
+#blue {
+    background: #0000ff; 
+    background: linear-gradient(top, #0000ff 0%, #bbbbbb 100%);  
+    background: -moz-linear-gradient(top, #0000ff 0%, #bbbbbb 100%); 
+    background: -webkit-linear-gradient(top, #0000ff 0%,#bbbbbb 100%); 
+    box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+    padding: 0 20px;
+    border-radius: 10px;  
+    list-style: none;
+    position: relative;
+}
+
+#yellow {
+    background: #ffff00; 
+    background: linear-gradient(top, #ffff00 0%, #bbbbbb 100%);  
+    background: -moz-linear-gradient(top, #ffff00 0%, #bbbbbb 100%); 
+    background: -webkit-linear-gradient(top, #ffff00 0%,#bbbbbb 100%); 
+    box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+    padding: 0 20px;
+    border-radius: 10px;  
+    list-style: none;
+    position: relative;
+}
+
+#brown {
+    background: brown; 
+    background: linear-gradient(top, brown 0%, #bbbbbb 100%);  
+    background: -moz-linear-gradient(top, brown 0%, #bbbbbb 100%); 
+    background: -webkit-linear-gradient(top, brown 0%,#bbbbbb 100%); 
+    box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+    padding: 0 20px;
+    border-radius: 10px;  
+    list-style: none;
+    position: relative;
+}
+
+#black {
+    background: #000000; 
+    background: linear-gradient(top, #000000 0%, #bbbbbb 100%);  
+    background: -moz-linear-gradient(top, #000000 0%, #bbbbbb 100%); 
+    background: -webkit-linear-gradient(top, #000000 0%,#bbbbbb 100%); 
+    box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+    padding: 0 20px;
+    border-radius: 10px;  
+    list-style: none;
+    position: relative;
+}
+
+</style>
+
+</head>
+<body  onload="main();">
+<canvas id="canvas" width="750" height="500" tabindex="1"></canvas>
+<audio id="explosion" preload="auto">
+  <source src="explosion.wav" type="audio/ogg">
+Your browser does not support the audio element.
+</audio> 
+<audio id="beeping" preload="auto">
+  <source src="beeping.wav" type="audio/ogg">
+Your browser does not support the audio element.
+</audio> 
+<form>
+ <input class="button" type="button" id="mode" value="Draw mode" onclick="switchMode();">
+<input class="button" type="button" id="red" value="   " onclick="cred();">
+<input class="button" type="button" id="green" value="   " onclick="cgreen();">
+<input class="button" type="button" id="blue" value="   " onclick="cblue();">
+<input class="button" type="button" id="yellow" value="   " onclick="cyellow();">
+<input class="button" type="button" id="brown" value="   " onclick="cbrown();">
+<input class="button" type="button" id="black" value="   " onclick="cblack();">
+<label>Font</label>
+<select id="fontchooser">
+  <option>Arial</option>
+  <option>Calibri</option>
+  <option>Comic Sans Ms</option>
+  <option>Courier</option>
+  <option>Cursive</option>
+  <option>Fantasy</option>
+  <option>Geneva</option>
+  <option selected="selected">Georgia</option>
+  <option>Helvetica</option>
+  <option>Impact</option>
+  <option>Lucida Console</option>
+  <option>Monaco</option>
+  <option>Times New Roman</option>
+  <option>Verdana</option>
+</select> 
+<select id="fonttype">
+  <option selected="selected">Normal</option>
+  <option>Bold</option>
+  <option>Italic</option>
+</select> 
+</form>
+<form>
+<label id="pagenumber">Page 1/1</label>
+<input class="button" type="button" value="Previous Page" onclick="previousPage();">
+<input class="button" type="button" value="Next Page" onclick="nextPage();">
+<input class="button" type="button" value="Copy Page" onclick="copyPage();">
+<input class="button" type="button" value="Save Pages" onclick="save();">
+<br>
+<input class="button" type="button" value="Delete Selection" onclick="deleteSelection();">
+<input class="button" type="button" value="Delete Page" onclick="deletePage();">
+<input class="button" type="button" value="Clear All" onclick="clearAll();">
+<input class="button" type="button" value="Insert Text" onclick="insertText();">
+<input id="inserttext" type="text" value="">
+</form>
+<!--
+<p id="input mode">Text Input Mode</p>
+<p id="current color">Current line color = blue</p>
+-->
+<form>
+<input class="button" type="button" value="Align Horizontally" onclick="alignHorizontal();">
+<input class="button" type="button" value="Align Vertically" onclick="alignVertical();">
+<input class="button" type="button" value="Circlify" onclick="circlify_command();">
+<input class="button" type="button" value="Rectify" onclick="rectify_command();">
+<input class="button" type="button" value="Straighten" onclick="straighten_command();">
+<br>
+<input class="button" type="button" value="Add Property" onclick="addProperty();">
+<input id="key-field" type="text" value="group">
+<input id="value-field" type="text" value="1">
+<br>
+<input class="button" type="button" value="Run Code" onclick="runCode();">
+<br>
+<textarea id="code" rows="5"  cols="80">
+</textarea>
+<br>
+<!--
+<input class="button" type="button" value="Randomize" onclick="randomize();">
+-->
+<form>
+<input class="button" type="button" value="Start Document" onclick="startDocument();">
+<input class="button" type="button" value="Title" onclick="addDocumentTitle();">
+<input class="button" type="button" value="Paragraph" onclick="addDocumentParagraph();">
+<input class="button" type="button" value="Stop Document" onclick="stopDocument();">
+
+<br>
+<p id="debug"></p>
+<p id="key code">key code =</p>
+<p id="pixel-color">R: G: B:</p>
+<p>&#169 2013 David Stover, San Bernardino, CA..................(Last updated 12/24/2013)
+</body>
+</html>
