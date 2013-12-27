@@ -257,7 +257,19 @@ function savePage(doc, pageIndex)
     var thePage = pages[pageIndex]; 
     for (var i = 0; i < thePage.boxes.length; i++) {
         var b = thePage.boxes[i];
-        var text = b.text;
+
+        // Escape the quotation mark in the output.
+        var tempText = b.text;
+        var text = "";
+        for (var c = 0; c < tempText.length; c++) {
+            var char = tempText.charAt(c);
+            if (char == '"') {
+                text += "\\\"";
+            } else {
+                text += char;
+            }
+        }
+
         var x = b.x;
         var y = b.y;
         var width = b.width;
