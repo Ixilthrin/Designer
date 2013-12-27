@@ -844,9 +844,9 @@ function main()
                return;
            }
        if (selectedIndices.length > 0) {
-           if ((document.body.scrollTop + e.clientY - canvas.offsetTop < 20 || document.body.scrollLeft + e.clientX - canvas.offsetLeft < 20 || document.body.scrollTop + e.clientY - canvas.offsetTop > canvas.height - 20) && confirm("Delete it?")) {
-               thePage.boxes[selectedIndices[0]].text = "";
-           }
+           //if ((document.body.scrollTop + e.clientY - canvas.offsetTop < 20 || document.body.scrollLeft + e.clientX - canvas.offsetLeft < 20 || document.body.scrollTop + e.clientY - canvas.offsetTop > canvas.height - 20) && confirm("Delete it?")) {
+           //    thePage.boxes[selectedIndices[0]].text = "";
+           //}
            previousTime = -1;
            
            previousX = -1;
