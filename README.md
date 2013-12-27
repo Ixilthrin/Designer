@@ -9,4 +9,4 @@ workflows, etc.  Written in a universal and simple language, and easily accessib
 The goal is to keep the application as simple as possible, both from a user perspective and a programmer
 perspective, and to exemplify the power of simplicity.
 
-Currently running at www.ixilthrin.com/designer.htm
+Currently running at www.ixilthrin.com
