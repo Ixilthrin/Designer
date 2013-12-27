@@ -265,6 +265,10 @@ function savePage(doc, pageIndex)
             var char = tempText.charAt(c);
             if (char == '"') {
                 text += "\\\"";
+            } else if (char == "<") {
+                text += "&lt;";
+            } else if (char == ">") {
+                text += "&gt;";
             } else {
                 text += char;
             }
