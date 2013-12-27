@@ -117,7 +117,7 @@ function cred()
 
 function cgreen()
 {
-    lineColor = "rgb(0, 255, 0)";
+    lineColor = "rgb(0, 102, 0)";
     for (var i = 0; i < selectedIndices.length; i++) {
        thePage.boxes[selectedIndices[i]].textColor = lineColor;
     }
@@ -139,7 +139,7 @@ function cblue()
 
 function cyellow()
 {
-    lineColor = "rgb(255, 255, 0)";
+    lineColor = "rgb(200, 200, 0)";
     for (var i = 0; i < selectedIndices.length; i++) {
        thePage.boxes[selectedIndices[i]].textColor = lineColor;
     }
@@ -1345,13 +1345,6 @@ function drawTextInBox(box, xPos, yPos, isSelected, imageIndex)
     box.height = height;
     context.lineWidth = 1;
     context.beginPath();
-/* david
-    context.moveTo(xPos - 6, yPos - height);
-    context.lineTo(xPos + width, yPos - height);
-    context.lineTo(xPos + width, yPos + 6);
-    context.lineTo(xPos - 6, yPos + 6);
-    context.lineTo(xPos - 6, yPos - height);
-*/
     context.moveTo(xPos - 6, yPos - lineHeight);
     context.lineTo(xPos + width, yPos - lineHeight);
     context.lineTo(xPos + width, yPos + 6 + height - lineHeight);
@@ -1368,7 +1361,6 @@ function drawTextInBox(box, xPos, yPos, isSelected, imageIndex)
     context.fillStyle = box.textColor;
     for (var i = 0; i < lines.length; i++) {
         var x = xPos;
-        //var y = yPos - (lines.length - 1) * lineHeight; // david
         var y = yPos;
         context.fillText(lines[i], x, y + i * lineHeight);
     }
