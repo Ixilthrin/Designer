@@ -127,6 +127,61 @@ function straighten_command()
     }
 }
 
+function split_command() {
+    var i;
+    var j;
+    for (i = 0; i < selectedIndices.length; i++) {
+        var o = thePage.boxes[selectedIndices[i]];
+        if (o.keys == undefined) {
+            o.keys = new Array();
+        }
+        if (o.values == undefined) {
+            o.values = new Array();
+        }
+        var splitText = o.text.split(" "); 
+        var curX = o.x;
+        var curY = o.y;
+        for (j = 0; j < splitText.length; j++) {
+            var newText = splitText[j];
+            thePage.boxes.push(createTextObject2(splitText[j], curX, curY, o.width, o.height, o.fontHeight, o.fontName, o.fontType, o.color, o.maxWidth, o.time, o.keys, o.values));
+            context.font = o.fontType + " " + o.fontHeight + "px " + o.fontName;
+            var textLength = context.measureText(newText).width;
+            curX += textLength + context.measureText(" ").width;
+        }
+    }
+    selectedIndices.sort();
+    for (i = selectedIndices.length - 1; i >= 0; i--) {
+        thePage.boxes.splice(selectedIndices[i], 1);
+    }
+    selectedIndices = new Array();
+}
+
+function join_command() {
+    var i;
+    var j;
+    var newText = "";
+    var o = new Object();
+    if (selectedIndices.length > 0) {
+        o = thePage.boxes[selectedIndices[0]];
+        if (o.keys == undefined) {
+            o.keys = new Array();
+        }
+        if (o.values == undefined) {
+            o.values = new Array();
+        }
+        newText = o.text;
+    }
+    for (i = 1; i < selectedIndices.length; i++) {
+        newText += " " + thePage.boxes[selectedIndices[i]].text;
+    }
+    selectedIndices.sort();
+    for (i = selectedIndices.length - 1; i >= 0; i--) {
+        thePage.boxes.splice(selectedIndices[i], 1);
+    }
+    thePage.boxes.push(createTextObject2(newText, o.x, o.y, o.width, o.height, o.fontHeight, o.fontName, o.fontType, o.color, o.maxWidth, o.time, o.keys, o.values));
+    selectedIndices = new Array();
+}
+
 function cred()
 {
     lineColor = "rgb(255, 0, 0)";
@@ -1345,6 +1400,8 @@ function draw()
         context.stroke();
         //context.setLineDash(initialDash);
     }
+/*
+    // Draw a box representing color mouse is over
     context.beginPath();
     context.moveTo(0, canvas.height - 50);
     context.lineTo(50, canvas.height - 50);
@@ -1354,6 +1411,7 @@ function draw()
     //context.fillStyle = "#22ffee";
     context.fillStyle = "rgb(" + currentRed + "," + currentGreen + "," + currentBlue + ")";
     context.fill();
+*/
 
 /*
     if (!firstClick) {
